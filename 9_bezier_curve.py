@@ -12,17 +12,17 @@ def safe_float(prompt, min_val=None, max_val=None):
         try:
             v = float(s)
             if min_val is not None and v < min_val:
-                print(f"❌ Must be >= {min_val}")
+                print(f" Must be >= {min_val}")
                 continue
             if max_val is not None and v > max_val:
-                print(f"❌ Must be <= {max_val}")
+                print(f" Must be <= {max_val}")
                 continue
             if not math.isfinite(v):
-                print("❌ Must be finite.")
+                print(" Must be finite.")
                 continue
             return v
         except ValueError:
-            print("❌ Please enter a valid number.")
+            print(" Please enter a valid number.")
 
 
 def safe_yes_no(prompt):
@@ -32,7 +32,7 @@ def safe_yes_no(prompt):
             return True
         if s in ("n", "no"):
             return False
-        print("❌ Enter y/n.")
+        print(" Enter y/n.")
 
 
 def read_point(name):
@@ -40,16 +40,16 @@ def read_point(name):
         s = input(f"{name} (x y): ").strip()
         parts = s.replace(",", " ").split()
         if len(parts) != 2:
-            print("❌ Enter two numbers like: 100 200")
+            print(" Enter two numbers like: 100 200")
             continue
         try:
             x, y = float(parts[0]), float(parts[1])
             if not (math.isfinite(x) and math.isfinite(y)):
-                print("❌ Coordinates must be finite.")
+                print(" Coordinates must be finite.")
                 continue
             return (x, y)
         except ValueError:
-            print("❌ Invalid input. Try again.")
+            print(" Invalid input. Try again.")
 
 
 # -----------------------------
@@ -106,7 +106,7 @@ def main():
     print("======================================================\n")
 
     # Input points
-    print("✅ Input Control Points")
+    print(" Input Control Points")
     print("We will use 4 points total:")
     print("Linear uses:    P0, P1")
     print("Quadratic uses: P0, P1, P2")
@@ -127,7 +127,7 @@ def main():
     cubic_pts = [P0, P1, P2, P3]
 
     # Edge case messages
-    print("\n⚠️ Checking edge cases...")
+    print("\ Checking edge cases...")
     for name, pts in [("Linear", linear_pts), ("Quadratic", quad_pts), ("Cubic", cubic_pts)]:
         case = degenerate_case(pts)
         if case == "ALL_SAME":
@@ -143,7 +143,7 @@ def main():
         Q = sample_curve(quad_pts, step)
         C = sample_curve(cubic_pts, step)
     except Exception as e:
-        print(f"❌ Sampling failed: {e}")
+        print(f" Sampling failed: {e}")
         return
 
     # Plot
@@ -186,3 +186,62 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+# 🔹 Example 1: Basic Smooth Curve (Recommended ⭐)
+# P0 (x y): 0 0
+# P1 (x y): 2 5
+# P2 (x y): 5 5
+# P3 (x y): 7 0
+
+# Enter step size Δt: 0.01
+# Show grid? y
+# Show control polygons? y
+
+# 👉 Result:
+
+# Linear → straight line
+# Quadratic → curved line
+# Cubic → smooth S-like curve
+
+# 🔹 Example 2: Straight Line Case
+# P0: 0 0
+# P1: 2 2
+# P2: 4 4
+# P3: 6 6
+
+# Δt: 0.01
+# Grid: y
+# Polygons: y
+
+# 👉 Result:
+
+# All curves become straight line
+# ✔ Because all points are collinear
+# 🔹 Example 3: Curve Bending Downward
+# P0: 0 0
+# P1: 3 -5
+# P2: 6 -5
+# P3: 9 0
+
+# Δt: 0.01
+# Grid: y
+# Polygons: y
+
+# 👉 Result:
+
+# Curve bends downward
+# 🔹 Example 4: Sharp Curve
+# P0: 0 0
+# P1: 0 10
+# P2: 10 10
+# P3: 10 0
+
+# Δt: 0.005
+# Grid: y
+# Polygons: y
+
+# 👉 Result:
+
+# Strong curved shape (almost rectangular arc)
