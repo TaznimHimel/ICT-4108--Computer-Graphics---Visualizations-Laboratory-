@@ -5,57 +5,59 @@ def DDA(x1, y1, x2, y2):
     dy = y2 - y1
     steps = int(max(abs(dx), abs(dy)))
 
-    # 🔹 1. Handle Zero Division Cas
     if steps == 0:
-        plt.plot(x1, y1, 'ro')
-        plt.text(x1, y1, f"({x1},{y1})")
-        plt.title("DDA Line Drawing Algorithm (Single Point)")
-        plt.grid(True)
-        plt.show()
-        return
+        return [x1], [y1]
 
-    # Calculate increment values
     Xinc = dx / steps
     Yinc = dy / steps
 
-    # Starting point
     x = x1
     y = y1
 
     x_points = []
     y_points = []
 
-    # Generate points
     for i in range(steps + 1):
-        x_rounded = round(x)
-        y_rounded = round(y)
-        x_points.append(x_rounded)
-        y_points.append(y_rounded)
-
+        x_points.append(x)   # smooth line (no rounding)
+        y_points.append(y)
         x += Xinc
         y += Yinc
 
-    # Plot the line
-    plt.plot(x_points, y_points, 'ro-')
-
-    # 🔹 2. Better Visualization
-    plt.axis('equal')
-
-    # 🔹 3. Add Labels to Points
-    for i in range(len(x_points)):
-        plt.text(x_points[i], y_points[i], f"({x_points[i]},{y_points[i]})")
-
-    plt.title("DDA Line Drawing Algorithm")
-    plt.xlabel("X axis")
-    plt.ylabel("Y axis")
-    plt.grid(True)
-    plt.show()
+    return x_points, y_points
 
 
-# Input from user
-x1 = int(input("Enter x1: "))
-y1 = int(input("Enter y1: "))
-x2 = int(input("Enter x2: "))
-y2 = int(input("Enter y2: "))
+# 🔹 Take input for 4 lines
+lines = []
+for i in range(4):
+    print(f"\nLine {i+1}:")
+    x1 = int(input("Enter x1: "))
+    y1 = int(input("Enter y1: "))
+    x2 = int(input("Enter x2: "))
+    y2 = int(input("Enter y2: "))
+    title = input("Enter title (e.g., slope < 1): ")
 
-DDA(x1, y1, x2, y2)
+    lines.append((x1, y1, x2, y2, title))
+
+
+# 🔹 Create 2x2 subplot window
+fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+
+for i, (x1, y1, x2, y2, title) in enumerate(lines):
+    ax = axes[i // 2][i % 2]
+
+    x_pts, y_pts = DDA(x1, y1, x2, y2)
+
+    ax.plot(x_pts, y_pts, marker='o')
+    ax.set_title(title)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.grid(True)
+    ax.axis('equal')
+
+    # Optional: label endpoints
+    ax.text(x1, y1, f"({x1},{y1})")
+    ax.text(x2, y2, f"({x2},{y2})")
+
+
+plt.tight_layout()
+plt.show()
