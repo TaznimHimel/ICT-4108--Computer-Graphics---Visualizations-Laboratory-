@@ -2,93 +2,70 @@ import matplotlib.pyplot as plt
 
 def midpoint_circle(radius, xc=0, yc=0):
 
-    # 🔹 Validate radius
     if radius <= 0:
-        print("Error: Radius must be a positive number.")
+        print("Radius must be positive.")
         return
 
     x, y = 0, radius
     p = 1 - radius
+    step = 1
 
-    points = set()  # 🔹 use set to avoid duplicate points
+    # 🎨 Colors for 8 octants
+    colors = ['red', 'orange', 'green', 'blue',
+              'purple', 'brown', 'pink', 'cyan']
 
-    print(f"\n--- Midpoint Circle Algorithm Output ---")
-    print(f"Center: ({xc}, {yc})")
-    print(f"Radius: {radius}")
-    print("\n  x\t  y\t  p-value\tDecision")
+    plt.figure(figsize=(6,6))
 
     while x <= y:
-        decision = "E" if p < 0 else "SE"
-        print(f"{x:3d}\t{y:3d}\t{p:8.2f}\t{decision}")
 
-        # 🔹 8-way symmetry (no duplicates due to set)
         symmetric_points = [
-            ( x + xc,  y + yc),
-            ( y + xc,  x + yc),
-            (-x + xc,  y + yc),
-            (-y + xc,  x + yc),
-            (-x + xc, -y + yc),
-            (-y + xc, -x + yc),
-            ( x + xc, -y + yc),
-            ( y + xc, -x + yc)
+            ( x + xc,  y + yc),   # 1
+            ( y + xc,  x + yc),   # 2
+            (-x + xc,  y + yc),   # 3
+            (-y + xc,  x + yc),   # 4
+            (-x + xc, -y + yc),   # 5
+            (-y + xc, -x + yc),   # 6
+            ( x + xc, -y + yc),   # 7
+            ( y + xc, -x + yc)    # 8
         ]
 
-        for pt in symmetric_points:
-            points.add(pt)
+        print(f"\nStep {step}: (x={x}, y={y}, p={p})")
+        print("8 Symmetric Points:")
+
+        for i, pt in enumerate(symmetric_points):
+            print(f"  P{i+1}: {pt}")
+
+            # 🔹 Plot each point with different color
+            plt.scatter(pt[0], pt[1], color=colors[i])
+
+            # 🔹 Label each point
+            plt.text(pt[0], pt[1], f"{pt}", fontsize=7)
 
         # Update decision parameter
         if p < 0:
-            p = p + 2 * x + 3
+            p += 2 * x + 3
         else:
-            p = p + 2 * (x - y) + 5
+            p += 2 * (x - y) + 5
             y -= 1
 
         x += 1
+        step += 1
 
-    # Convert set → list
-    points = list(points)
+    # Center
+    plt.scatter(xc, yc, color='black', s=60, label="Center")
 
-    # Separate x and y
-    xs = [pt[0] for pt in points]
-    ys = [pt[1] for pt in points]
-
-    # 🔹 Plot points
-    plt.figure(figsize=(6, 6))
-    plt.scatter(xs, ys)
-
-    # 🔹 Center point
-    plt.scatter(xc, yc, label=f"Center ({xc},{yc})")
-
-    # 🔹 Add labels (optional)
-    for (x, y) in points:
-        plt.text(x, y, f"({x},{y})", fontsize=7)
-
-    # 🔹 Better visualization
+    plt.title(f"Midpoint Circle (Step-wise Octants)")
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.axis("equal")
-    plt.title(f"Midpoint Circle (r={radius}, center=({xc},{yc}))")
-    plt.xlabel("X-axis")
-    plt.ylabel("Y-axis")
     plt.grid(True)
-    plt.legend()
 
     plt.show()
 
 
-# ---- Main Execution ----
-try:
-    r = int(input("Enter radius: "))
-    xc = int(input("Enter X-coordinate of center: "))
-    yc = int(input("Enter Y-coordinate of center: "))
+# Run
+r = int(input("Enter radius: "))
+xc = int(input("Enter center x: "))
+yc = int(input("Enter center y: "))
 
-    midpoint_circle(r, xc, yc)
-
-except ValueError:
-    print("Invalid input. Please enter integer values only.")
-except Exception as e:
-    print(f"Unexpected error: {e}")
-
-
-
-# Enter radius: 5
-# Enter X-coordinate of center: 0
-# Enter Y-coordinate of center: 0
+midpoint_circle(r, xc, yc)
