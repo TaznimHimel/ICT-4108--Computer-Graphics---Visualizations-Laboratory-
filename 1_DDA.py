@@ -61,3 +61,34 @@ for i, (x1, y1, x2, y2, title) in enumerate(lines):
 
 plt.tight_layout()
 plt.show()
+
+
+
+
+# Line 1:
+# Enter x1: 0
+# Enter y1: 0
+# Enter x2: 5
+# Enter y2: 5
+# Enter title (e.g., slope < 1): slope = 1
+
+# Line 2:
+# Enter x1: 0
+# Enter y1: 0
+# Enter x2: 6
+# Enter y2: 2
+# Enter title (e.g., slope < 1): slope < 1
+
+# Line 3:
+# Enter x1: 0
+# Enter y1: 0
+# Enter x2: 2
+# Enter y2: 6
+# Enter title (e.g., slope < 1): slope > 1
+
+# Line 4:
+# Enter x1: 0
+# Enter y1: 5
+# Enter x2: 5
+# Enter y2: 0
+# Enter title (e.g., slope < 1): negative slope
