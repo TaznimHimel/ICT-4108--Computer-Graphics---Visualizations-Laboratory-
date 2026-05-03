@@ -1,4 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
+
+# 🔥 সুন্দর look এর জন্য
+plt.style.use('seaborn-v0_8')
+plt.style.use('dark_background')
 
 def midpoint_circle(radius, xc=0, yc=0):
 
@@ -10,38 +15,52 @@ def midpoint_circle(radius, xc=0, yc=0):
     p = 1 - radius
     step = 1
 
-    # 🎨 Colors for 8 octants
     colors = ['red', 'orange', 'green', 'blue',
               'purple', 'brown', 'pink', 'cyan']
 
-    plt.figure(figsize=(6,6))
+    plt.figure(figsize=(7,7))
+
+    # 🔵 smooth circle boundary (visual beauty)
+    theta = np.linspace(0, 2*np.pi, 400)
+    cx = xc + radius * np.cos(theta)
+    cy = yc + radius * np.sin(theta)
+    plt.plot(cx, cy, color='white', linewidth=1.5, label="Actual Circle")
 
     while x <= y:
 
+        # 🔹 Classification
+        if p < 0:
+            status = "Inside"
+        elif p == 0:
+            status = "On Circle"
+        else:
+            status = "Outside"
+
         symmetric_points = [
-            ( x + xc,  y + yc),   # 1
-            ( y + xc,  x + yc),   # 2
-            (-x + xc,  y + yc),   # 3
-            (-y + xc,  x + yc),   # 4
-            (-x + xc, -y + yc),   # 5
-            (-y + xc, -x + yc),   # 6
-            ( x + xc, -y + yc),   # 7
-            ( y + xc, -x + yc)    # 8
+            ( x + xc,  y + yc),
+            ( y + xc,  x + yc),
+            (-x + xc,  y + yc),
+            (-y + xc,  x + yc),
+            (-x + xc, -y + yc),
+            (-y + xc, -x + yc),
+            ( x + xc, -y + yc),
+            ( y + xc, -x + yc)
         ]
 
-        print(f"\nStep {step}: (x={x}, y={y}, p={p})")
+        # 🔥 Terminal output
+        print(f"\nStep {step}: (x={x}, y={y}, p={p}) → {status}")
         print("8 Symmetric Points:")
 
         for i, pt in enumerate(symmetric_points):
             print(f"  P{i+1}: {pt}")
 
-            # 🔹 Plot each point with different color
-            plt.scatter(pt[0], pt[1], color=colors[i])
+            # plot (same logic, just cleaner)
+            plt.scatter(pt[0], pt[1],
+                        color=colors[i],
+                        s=60,
+                        alpha=0.9)
 
-            # 🔹 Label each point
-            plt.text(pt[0], pt[1], f"{pt}", fontsize=7)
-
-        # Update decision parameter
+        # 🔹 Update
         if p < 0:
             p += 2 * x + 3
         else:
@@ -52,18 +71,24 @@ def midpoint_circle(radius, xc=0, yc=0):
         step += 1
 
     # Center
-    plt.scatter(xc, yc, color='black', s=60, label="Center")
+    plt.scatter(xc, yc, color='yellow', s=100, label="Center")
 
-    plt.title(f"Midpoint Circle (Step-wise Octants)")
+    # 🔹 Legend (classification meaning)
+    plt.scatter([], [], color='green', label="Inside (p<0)")
+    plt.scatter([], [], color='blue', label="On (p=0)")
+    plt.scatter([], [], color='red', label="Outside (p>0)")
+
+    plt.title("Midpoint Circle (Beautiful + Classified)")
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.axis("equal")
-    plt.grid(True)
+    plt.grid(True, linestyle='--', alpha=0.4)
 
+    plt.legend()
     plt.show()
 
 
-# Run
+# 🔹 Run
 r = int(input("Enter radius: "))
 xc = int(input("Enter center x: "))
 yc = int(input("Enter center y: "))
