@@ -46,100 +46,111 @@ def apply_transformation(points, matrix):
     return transformed[:, :2]
 
 
-# ----------------- Plot Function ----------------- #
+# ----------------- Default Transformations (Option 1) ----------------- #
 
-def plot_shape(original, transformed, title="Transformation"):
-    fig, ax = plt.subplots(figsize=(6, 6))
+def get_default_transformations():
+    return [
+        ("Translation (2,2)", get_translation_matrix(2, 2)),
+        ("Scaling (1.5,1.5)", get_scaling_matrix(1.5, 1.5)),
+        ("Rotation (45°)", get_rotation_matrix(45)),
+        ("Shearing (1,0)", get_shear_matrix(1, 0)),
+        ("Reflection (x-axis)", get_reflection_matrix('x')),
+        # ("Reflection (y-axis)", get_reflection_matrix('y'))
+    ]
 
-    # Close shapes
-    orig = np.vstack([original, original[0]])
-    trans = np.vstack([transformed, transformed[0]])
 
-    # Plot
-    ax.plot(orig[:, 0], orig[:, 1], 'k--', label='Original')
-    ax.plot(trans[:, 0], trans[:, 1], 'b-', linewidth=2, label='Transformed')
-    ax.fill(trans[:, 0], trans[:, 1], alpha=0.2)
+def apply_with_labels(points, transformations):
+    steps = [("Original", points)]
+    current = points
 
-    # 🔹 Labels for points
-    for (x, y) in original:
-        ax.text(x, y, f"({x},{y})", color='gray', fontsize=8)
+    for name, matrix in transformations:
+        current = apply_transformation(current, matrix)
+        steps.append((name, current))
 
-    for (x, y) in transformed:
-        ax.text(x, y, f"({x:.1f},{y:.1f})", color='blue', fontsize=8)
+    return steps
 
-    # Axes & grid
-    ax.axhline(0)
-    ax.axvline(0)
-    ax.grid(True, linestyle='--', alpha=0.5)
-    ax.set_aspect('equal')
 
-    ax.set_title(title)
-    ax.legend()
+# ----------------- Subplot Visualization ----------------- #
 
+def plot_all_transformations_subplots(steps):
+    n = len(steps)
+    cols = 3
+    rows = int(np.ceil(n / cols))
+
+    fig, axes = plt.subplots(rows, cols, figsize=(12, 4 * rows))
+    axes = axes.flatten()
+
+    for i, (name, shape) in enumerate(steps):
+        ax = axes[i]
+        closed = np.vstack([shape, shape[0]])
+
+        if i == 0:
+            ax.plot(closed[:, 0], closed[:, 1], 'k--')
+        else:
+            ax.plot(closed[:, 0], closed[:, 1], 'b-', linewidth=2)
+
+        # 🔥 ADD THIS LINE (points visible)
+        ax.scatter(shape[:, 0], shape[:, 1], s=40)
+
+        # Label points
+        for (x, y) in shape:
+            ax.text(x, y, f"({x:.1f},{y:.1f})", fontsize=8)
+
+        ax.set_title(name)
+        ax.axhline(0)
+        ax.axvline(0)
+        ax.grid(True, linestyle='--', alpha=0.5)
+        ax.set_aspect('equal')
+
+    for j in range(i + 1, len(axes)):
+        axes[j].axis('off')
+
+    plt.tight_layout()
     plt.show()
 
 
-# ----------------- Input Helpers ----------------- #
-
-def input_float(msg):
-    while True:
-        try:
-            return float(input(msg))
-        except:
-            print("Invalid input!")
-
-def input_int(msg):
-    while True:
-        try:
-            return int(input(msg))
-        except:
-            print("Invalid input!")
-
-
-# ----------------- Combine Transformations 🔥 ----------------- #
+# ----------------- Combined Transformation ----------------- #
 
 def combine_transformations():
     print("\nHow many transformations do you want to combine?")
-    n = input_int("Enter number: ")
+    n = int(input("Enter number: "))
 
     final_matrix = np.eye(3)
 
     for i in range(n):
         print(f"\nTransformation {i+1}:")
-        matrix = choose_transformation(single=True)
+        matrix = choose_transformation()
         final_matrix = matrix @ final_matrix
 
     return final_matrix
 
 
-# ----------------- Menu ----------------- #
-
-def choose_transformation(single=False):
+def choose_transformation():
     print("\n1. Translation")
     print("2. Scaling")
     print("3. Rotation")
     print("4. Shearing")
     print("5. Reflection")
 
-    ch = input_int("Choose: ")
+    ch = int(input("Choose: "))
 
     if ch == 1:
-        tx = input_float("tx: ")
-        ty = input_float("ty: ")
+        tx = float(input("tx: "))
+        ty = float(input("ty: "))
         return get_translation_matrix(tx, ty)
 
     elif ch == 2:
-        sx = input_float("sx: ")
-        sy = input_float("sy: ")
+        sx = float(input("sx: "))
+        sy = float(input("sy: "))
         return get_scaling_matrix(sx, sy)
 
     elif ch == 3:
-        angle = input_float("Angle: ")
+        angle = float(input("Angle: "))
         return get_rotation_matrix(angle)
 
     elif ch == 4:
-        shx = input_float("shear x: ")
-        shy = input_float("shear y: ")
+        shx = float(input("shear x: "))
+        shy = float(input("shear y: "))
         return get_shear_matrix(shx, shy)
 
     elif ch == 5:
@@ -151,95 +162,52 @@ def choose_transformation(single=False):
         return np.eye(3)
 
 
+# ----------------- Final Plot ----------------- #
+
+def plot_shape(original, transformed, title="Transformation"):
+    fig, ax = plt.subplots(figsize=(6, 6))
+
+    orig = np.vstack([original, original[0]])
+    trans = np.vstack([transformed, transformed[0]])
+
+    ax.plot(orig[:, 0], orig[:, 1], 'k--', label='Original')
+    ax.plot(trans[:, 0], trans[:, 1], 'r-', linewidth=2, label='Transformed')
+
+    ax.set_title(title)
+    ax.legend()
+    ax.grid(True)
+    ax.set_aspect('equal')
+
+    plt.show()
+
+
 # ----------------- MAIN ----------------- #
 
 if __name__ == "__main__":
-    try:
-        # Default shape (house)
-        shape = np.array([
-            [1, 1],
-            [3, 1],
-            [3, 3],
-            [2, 4],
-            [1, 3]
-        ])
 
-        print("\n==== 2D Transformation Program ====")
-        print("1. Single Transformation")
-        print("2. Combined Transformations")
+    shape = np.array([
+        [1, 1],
+        [3, 1],
+        [3, 3],
+        [2, 4],
+        [1, 3]
+    ])
 
-        mode = input_int("Select mode: ")
+    print("\n==== 2D Transformation Program ====")
+    print("1. Show All Transformations (Subplots)")
+    print("2. Combined Transformations")
 
-        if mode == 1:
-            matrix = choose_transformation()
-            title = "Single Transformation"
+    mode = int(input("Select mode: "))
 
-        elif mode == 2:
-            matrix = combine_transformations()
-            title = "Combined Transformations"
+    if mode == 1:
+        transformations = get_default_transformations()
+        steps = apply_with_labels(shape, transformations)
+        plot_all_transformations_subplots(steps)
 
-        else:
-            print("Invalid option")
-            exit()
-
+    elif mode == 2:
+        matrix = combine_transformations()
         result = apply_transformation(shape, matrix)
-        plot_shape(shape, result, title)
+        plot_shape(shape, result, "Combined Transformation")
 
-    except Exception as e:
-        print("Error:", e)
-
-
-
-# Example Usage:
-# ==== 2D Transformation Program ====
-# 1. Single Transformation
-# 2. Combined Transformations 🔥
-
-# Select mode: 1
-
-# 1. Translation
-# 2. Scaling
-# 3. Rotation
-# 4. Shearing
-# 5. Reflection
-
-# Choose: 1
-# tx: 2
-# ty: 3
-
-
-
-
-
-# Example 2: Single Transformation (Rotation)
-# Select mode: 1
-# Choose: 3
-# Angle: 45
-
-# 👉 Result:
-
-# Shape rotates 45° counter-clockwise
-
-
-
-
-
-# Example 5: Combined Transformations (BEST)
-# Select mode: 2
-
-# How many transformations do you want to combine?
-# Enter number: 2
-
-# Transformation 1:
-# Choose: 3
-# Angle: 45
-
-# Transformation 2:
-# Choose: 1
-# tx: 2
-# ty: 3
-
-# 👉 Result:
-
-# Shape rotates 45°
-# Then moves (2,3)
+    else:
+        print("Invalid option")
