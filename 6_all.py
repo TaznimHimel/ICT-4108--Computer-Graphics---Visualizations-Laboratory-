@@ -46,70 +46,71 @@ def apply_transformation(points, matrix):
     return transformed[:, :2]
 
 
-# ----------------- Default Transformations (Option 1) ----------------- #
+# ----------------- Clean Plot ----------------- #
 
-def get_default_transformations():
-    return [
-        ("Translation (2,2)", get_translation_matrix(2, 2)),
-        ("Scaling (1.5,1.5)", get_scaling_matrix(1.5, 1.5)),
-        ("Rotation (45°)", get_rotation_matrix(45)),
-        ("Shearing (1,0)", get_shear_matrix(1, 0)),
-        ("Reflection (x-axis)", get_reflection_matrix('x')),
-        # ("Reflection (y-axis)", get_reflection_matrix('y'))
-    ]
+def plot_shape(ax, points, label, color):
+    x = points[:, 0]
+    y = points[:, 1]
 
+    # 🔥 smooth clean line (no points)
+    ax.plot(x, y, color=color, linewidth=3, label=label)
+    ax.fill(x, y, color=color, alpha=0.25)
 
-def apply_with_labels(points, transformations):
-    steps = [("Original", points)]
-    current = points
+    # axes
+    ax.axhline(0, color='black', linewidth=1)
+    ax.axvline(0, color='black', linewidth=1)
 
-    for name, matrix in transformations:
-        current = apply_transformation(current, matrix)
-        steps.append((name, current))
-
-    return steps
+    ax.set_aspect("equal")
+    ax.grid(True, linestyle='--', alpha=0.4)
+    ax.legend(fontsize=10)
 
 
-# ----------------- Subplot Visualization ----------------- #
+# ----------------- Option 1 ----------------- #
 
-def plot_all_transformations_subplots(steps):
-    n = len(steps)
-    cols = 3
-    rows = int(np.ceil(n / cols))
+def run_all_transformations(shape):
 
-    fig, axes = plt.subplots(rows, cols, figsize=(12, 4 * rows))
+    translated = apply_transformation(shape, get_translation_matrix(3, 2))
+    scaled = apply_transformation(shape, get_scaling_matrix(1.5, 0.5))
+    rotated = apply_transformation(shape, get_rotation_matrix(45))
+    sheared = apply_transformation(shape, get_shear_matrix(1, 0.2))
+    reflected_x = apply_transformation(shape, get_reflection_matrix("x"))
+    # reflected_y = apply_transformation(shape, get_reflection_matrix("y"))  ❌ removed
+
+    # 🔥 global axis scale
+    all_points = np.vstack([
+        shape, translated, scaled,
+        rotated, sheared, reflected_x
+    ])
+
+    xmin, ymin = all_points.min(axis=0) - 1
+    xmax, ymax = all_points.max(axis=0) + 1
+
+    # 🔥 bigger figure
+    fig, axes = plt.subplots(2, 3, figsize=(14, 10))
     axes = axes.flatten()
 
-    for i, (name, shape) in enumerate(steps):
+    data = [
+        ("Original", shape, "#2c3e50"),
+        ("Translation", translated, "#e74c3c"),
+        ("Scaling", scaled, "#27ae60"),
+        ("Rotation", rotated, "#2980b9"),
+        ("Shearing", sheared, "#8e44ad"),
+        ("Reflection (X)", reflected_x, "#f39c12"),
+    ]
+
+    for i, (title, pts, color) in enumerate(data):
         ax = axes[i]
-        closed = np.vstack([shape, shape[0]])
+        plot_shape(ax, pts, title, color)
+        ax.set_title(title, fontsize=12, weight='bold')
 
-        if i == 0:
-            ax.plot(closed[:, 0], closed[:, 1], 'k--')
-        else:
-            ax.plot(closed[:, 0], closed[:, 1], 'b-', linewidth=2)
-
-        # 🔥 ADD THIS LINE (points visible)
-        ax.scatter(shape[:, 0], shape[:, 1], s=40)
-
-        # Label points
-        for (x, y) in shape:
-            ax.text(x, y, f"({x:.1f},{y:.1f})", fontsize=8)
-
-        ax.set_title(name)
-        ax.axhline(0)
-        ax.axvline(0)
-        ax.grid(True, linestyle='--', alpha=0.5)
-        ax.set_aspect('equal')
-
-    for j in range(i + 1, len(axes)):
-        axes[j].axis('off')
+        ax.set_xlim(xmin, xmax)
+        ax.set_ylim(ymin, ymax)
 
     plt.tight_layout()
     plt.show()
 
 
-# ----------------- Combined Transformation ----------------- #
+# ----------------- Option 2 ----------------- #
 
 def combine_transformations():
     print("\nHow many transformations do you want to combine?")
@@ -162,18 +163,16 @@ def choose_transformation():
         return np.eye(3)
 
 
-# ----------------- Final Plot ----------------- #
-
-def plot_shape(original, transformed, title="Transformation"):
+def plot_shape_final(original, transformed):
     fig, ax = plt.subplots(figsize=(6, 6))
 
     orig = np.vstack([original, original[0]])
     trans = np.vstack([transformed, transformed[0]])
 
-    ax.plot(orig[:, 0], orig[:, 1], 'k--', label='Original')
-    ax.plot(trans[:, 0], trans[:, 1], 'r-', linewidth=2, label='Transformed')
+    ax.plot(orig[:, 0], orig[:, 1], 'k--', linewidth=2, label='Original')
+    ax.plot(trans[:, 0], trans[:, 1], 'r-', linewidth=3, label='Transformed')
 
-    ax.set_title(title)
+    ax.set_title("Combined Transformation", fontsize=12, weight='bold')
     ax.legend()
     ax.grid(True)
     ax.set_aspect('equal')
@@ -190,24 +189,23 @@ if __name__ == "__main__":
         [3, 1],
         [3, 3],
         [2, 4],
-        [1, 3]
+        [1, 3],
+        [1, 1]
     ])
 
     print("\n==== 2D Transformation Program ====")
-    print("1. Show All Transformations (Subplots)")
+    print("1. Show All Transformations")
     print("2. Combined Transformations")
 
     mode = int(input("Select mode: "))
 
     if mode == 1:
-        transformations = get_default_transformations()
-        steps = apply_with_labels(shape, transformations)
-        plot_all_transformations_subplots(steps)
+        run_all_transformations(shape)
 
     elif mode == 2:
         matrix = combine_transformations()
         result = apply_transformation(shape, matrix)
-        plot_shape(shape, result, "Combined Transformation")
+        plot_shape_final(shape, result)
 
     else:
         print("Invalid option")
