@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+# 🔹 Region Codes
 INSIDE, LEFT, RIGHT, BOTTOM, TOP = 0, 1, 2, 4, 8
 
 
@@ -64,56 +65,50 @@ for i in range(n):
     lines.append((x1, y1, x2, y2))
 
 
-# 🔹 Plot
+# 🔹 Plot Setup
 plt.figure(figsize=(9,9))
 
-# Window (thick)
+# Window
 plt.plot([xmin,xmax,xmax,xmin,xmin],
          [ymin,ymin,ymax,ymax,ymin],
          color='black', linewidth=3)
 
-# Expand limits for better spacing
+# Margin for clear view
 margin_x = (xmax - xmin) * 0.4
 margin_y = (ymax - ymin) * 0.4
 plt.xlim(xmin - margin_x, xmax + margin_x)
 plt.ylim(ymin - margin_y, ymax + margin_y)
 
-
-# 🔹 Boundary Labels (BIG + CLEAR)
 mid_x = (xmin + xmax)/2
 mid_y = (ymin + ymax)/2
 
-plt.text(mid_x, ymax + margin_y*0.3, "TOP", ha='center', fontsize=12, weight='bold')
-plt.text(mid_x, ymin - margin_y*0.3, "BOTTOM", ha='center', fontsize=12, weight='bold')
-plt.text(xmin - margin_x*0.3, mid_y, "LEFT", va='center', rotation=90, fontsize=12, weight='bold')
-plt.text(xmax + margin_x*0.3, mid_y, "RIGHT", va='center', rotation=90, fontsize=12, weight='bold')
+# 🔹 Boundary Labels
+plt.text(mid_x, ymax + margin_y*0.25, "TOP", ha='center', fontsize=12, weight='bold')
+plt.text(mid_x, ymin - margin_y*0.25, "BOTTOM", ha='center', fontsize=12, weight='bold')
+plt.text(xmin - margin_x*0.25, mid_y, "LEFT", va='center', rotation=90, fontsize=12, weight='bold')
+plt.text(xmax + margin_x*0.25, mid_y, "RIGHT", va='center', rotation=90, fontsize=12, weight='bold')
 
-
-# 🔹 Region Codes (BOX STYLE)
-def region_label(x, y, text, color='darkred'):
+# 🔹 Region Code Boxes
+def region_box(x, y, text, color='darkred'):
     plt.text(x, y, text,
-             fontsize=10,
              ha='center',
+             fontsize=10,
              bbox=dict(facecolor='white', edgecolor=color, boxstyle='round,pad=0.3'))
 
 offset_x = margin_x * 0.5
 offset_y = margin_y * 0.5
 
-# Top
-region_label(mid_x, ymax + offset_y, "1000")
-region_label(xmin - offset_x, ymax + offset_y, "1001")
-region_label(xmax + offset_x, ymax + offset_y, "1010")
+region_box(mid_x, ymax + offset_y, "1000")
+region_box(xmin - offset_x, ymax + offset_y, "1001")
+region_box(xmax + offset_x, ymax + offset_y, "1010")
 
-# Middle
-region_label(xmin - offset_x, mid_y, "0001")
-region_label(mid_x, mid_y, "0000", color='green')
-region_label(xmax + offset_x, mid_y, "0010")
+region_box(xmin - offset_x, mid_y, "0001")
+region_box(mid_x, mid_y, "0000", color='green')
+region_box(xmax + offset_x, mid_y, "0010")
 
-# Bottom
-region_label(mid_x, ymin - offset_y, "0100")
-region_label(xmin - offset_x, ymin - offset_y, "0101")
-region_label(xmax + offset_x, ymin - offset_y, "0110")
-
+region_box(mid_x, ymin - offset_y, "0100")
+region_box(xmin - offset_x, ymin - offset_y, "0101")
+region_box(xmax + offset_x, ymin - offset_y, "0110")
 
 # 🔹 Lines
 colors = ['red','green','blue','magenta','cyan']
@@ -125,24 +120,34 @@ for i,(x1,y1,x2,y2) in enumerate(lines):
         x1,y1,x2,y2,xmin,ymin,xmax,ymax
     )
 
-    # Original
+    # Original line
     plt.plot([x1,x2],[y1,y2],'--',color=color,alpha=0.5)
 
-    # Points
+    # Original points
     plt.scatter([x1,x2],[y1,y2],color=color,s=40)
 
     if status != "Rejected":
-        # Clipped
+        # Clipped line
         plt.plot([cx1,cx2],[cy1,cy2],color=color,linewidth=3)
 
-        # Highlight intersection
-        plt.scatter([cx1,cy1],[cy1,cy2])  # (ignore if typo earlier)
-        plt.scatter([cx1,cx2],[cy1,cy2],color='yellow',edgecolor='black',s=80,zorder=5)
+        # Intersection points
+        plt.scatter([cx1,cx2],[cy1,cy2],
+                    color='yellow',edgecolor='black',s=80,zorder=5)
+
+        plt.text(cx1, cy1, "C1", fontsize=9)
+        plt.text(cx2, cy2, "C2", fontsize=9)
 
 
-# 🔹 Final Styling
-plt.title("Cohen–Sutherland Line Clipping\n(Enhanced Visualization)",
+# 🔹 Title
+plt.title("Cohen–Sutherland Line Clipping Algorithm\n(Full Visualization)",
           fontsize=15, weight='bold')
+
+# 🔹 Bottom Legend
+plt.figtext(0.5, 0.02,
+            "Colors = Different Lines | Dashed = Original | Bold = Clipped | Yellow = Intersection",
+            ha='center',
+            fontsize=10,
+            bbox=dict(facecolor='white', edgecolor='black'))
 
 plt.grid(True, linestyle='--', alpha=0.4)
 plt.axis('equal')
@@ -152,37 +157,34 @@ plt.show()
 
 
 
+# Example Input (Best for Demo)
 # xmin: 10
 # ymin: 10
 # xmax: 30
 # ymax: 30
-# Number of lines: 5
 
-# Line 1
+# Number of lines: 5
+# 🔹 Line 1 → Completely inside
 # x1: 12
 # y1: 15
 # x2: 25
 # y2: 28
-
-# Line 2
+# 🔹 Line 2 → Completely outside (reject)
 # x1: 0
 # y1: 0
 # x2: 5
 # y2: 5
-
-# Line 3
-# x1: 6
-# y1: 6
+# 🔹 Line 3 → Partially inside (clipped)
+# x1: 5
+# y1: 5
 # x2: 25
 # y2: 25
-
-# Line 4
+# 🔹 Line 4 → Vertical crossing
 # x1: 20
 # y1: 40
 # x2: 20
 # y2: 0
-
-# Line 5
+# 🔹 Line 5 → Horizontal crossing
 # x1: 0
 # y1: 20
 # x2: 40
