@@ -1,28 +1,41 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
-def midpoint_circle(radius, xc=0, yc=0):
+plt.style.use('dark_background')
 
-    # 🔹 Validate radius
+def bresenhams_circle(radius, xc=0, yc=0):
+
     if radius <= 0:
-        print("Error: Radius must be a positive number.")
+        print("Radius must be positive.")
         return
 
     x, y = 0, radius
     p = 3 - 2 * radius
+    step = 1
 
-    points = set()  # 🔹 remove duplicates
+    plt.figure(figsize=(8,8))
 
-    print(f"\n--- Midpoint Circle Algorithm Output ---")
-    print(f"Center: ({xc}, {yc})")
-    print(f"Radius: {radius}")
-    print("\n  x\t  y\t  p-value\tDecision")
+    # 🔵 Smooth circle reference
+    theta = np.linspace(0, 2*np.pi, 400)
+    cx = xc + radius * np.cos(theta)
+    cy = yc + radius * np.sin(theta)
+    plt.plot(cx, cy, color='white', linewidth=1.5, label="Actual Circle")
 
     while x <= y:
-        decision = "E" if p < 0 else "SE"
-        print(f"{x:3d}\t{y:3d}\t{p:8.2f}\t{decision}")
 
-        # 🔹 8-way symmetry
-        symmetric_points = [
+        # 🔹 Classification
+        if p < 0:
+            status = "Inside"
+            color = 'green'
+        elif p == 0:
+            status = "On Circle"
+            color = 'blue'
+        else:
+            status = "Outside"
+            color = 'red'
+
+        # 🔥 Use set → avoid duplicates
+        symmetric_points = {
             ( x + xc,  y + yc),
             ( y + xc,  x + yc),
             (-x + xc,  y + yc),
@@ -31,12 +44,21 @@ def midpoint_circle(radius, xc=0, yc=0):
             (-y + xc, -x + yc),
             ( x + xc, -y + yc),
             ( y + xc, -x + yc)
-        ]
+        }
 
-        for pt in symmetric_points:
-            points.add(pt)
+        print(f"\nStep {step}: (x={x}, y={y}, p={p}) → {status}")
+        print("Symmetric Points:")
 
-        # 🔹 Update decision parameter (integer version)
+        for i, pt in enumerate(symmetric_points):
+            print(f"  P{i+1}: {pt}")
+
+            plt.scatter(pt[0], pt[1],
+                        color=color,
+                        s=80,
+                        edgecolors='white',
+                        linewidth=0.7)
+
+        # 🔹 Update
         if p < 0:
             p = p + 4 * x + 6
         else:
@@ -44,50 +66,34 @@ def midpoint_circle(radius, xc=0, yc=0):
             y -= 1
 
         x += 1
+        step += 1
 
-    # Convert set → list
-    points = list(points)
+    # 🔹 Center
+    plt.scatter(xc, yc, color='yellow', s=130, label="Center")
 
-    # Separate coordinates
-    xs = [pt[0] for pt in points]
-    ys = [pt[1] for pt in points]
+    # 🔹 Axis limits (important for beauty)
+    plt.xlim(xc - radius - 2, xc + radius + 2)
+    plt.ylim(yc - radius - 2, yc + radius + 2)
 
-    # 🔹 Plot
-    plt.figure(figsize=(6, 6))
-    plt.scatter(xs, ys)
+    # 🔹 Legend
+    plt.scatter([], [], color='green', label="Inside (p<0)")
+    plt.scatter([], [], color='blue', label="On (p=0)")
+    plt.scatter([], [], color='red', label="Outside (p>0)")
 
-    # 🔹 Center point
-    plt.scatter(xc, yc, label=f"Center ({xc},{yc})")
-
-    # 🔹 Add labels (optional but useful)
-    for (x, y) in points:
-        plt.text(x, y, f"({x},{y})", fontsize=7)
-
-    # 🔹 Better visualization
-    plt.axis("equal")
-    plt.title(f"Midpoint Circle (Integer) r={radius}, center=({xc},{yc})")
+    plt.title("Bresenham's Circle (Final Exam Version)", fontsize=15)
     plt.xlabel("X-axis")
     plt.ylabel("Y-axis")
-    plt.grid(True)
-    plt.legend()
 
+    plt.axis("equal")
+    plt.grid(True, linestyle='--', alpha=0.4)
+
+    plt.legend()
     plt.show()
 
 
-# ---- Main Execution ----
-try:
-    r = int(input("Enter radius: "))
-    xc = int(input("Enter X-coordinate of center: "))
-    yc = int(input("Enter Y-coordinate of center: "))
+# 🔹 Run
+r = int(input("Enter radius: "))
+xc = int(input("Enter center x: "))
+yc = int(input("Enter center y: "))
 
-    midpoint_circle(r, xc, yc)
-
-except ValueError:
-    print("Invalid input. Please enter integer values only.")
-except Exception as e:
-    print(f"Unexpected error: {e}")
-
-
-# Enter radius: 6
-# Enter X-coordinate of center: 0
-# Enter Y-coordinate of center: 0
+bresenhams_circle(r, xc, yc)
