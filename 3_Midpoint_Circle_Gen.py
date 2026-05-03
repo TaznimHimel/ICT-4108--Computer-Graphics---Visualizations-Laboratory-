@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 🔥 সুন্দর look এর জন্য
-plt.style.use('seaborn-v0_8')
 plt.style.use('dark_background')
 
 def midpoint_circle(radius, xc=0, yc=0):
@@ -15,12 +13,9 @@ def midpoint_circle(radius, xc=0, yc=0):
     p = 1 - radius
     step = 1
 
-    colors = ['red', 'orange', 'green', 'blue',
-              'purple', 'brown', 'pink', 'cyan']
+    plt.figure(figsize=(8,8))
 
-    plt.figure(figsize=(7,7))
-
-    # 🔵 smooth circle boundary (visual beauty)
+    # 🔵 Smooth circle (reference)
     theta = np.linspace(0, 2*np.pi, 400)
     cx = xc + radius * np.cos(theta)
     cy = yc + radius * np.sin(theta)
@@ -28,13 +23,16 @@ def midpoint_circle(radius, xc=0, yc=0):
 
     while x <= y:
 
-        # 🔹 Classification
+        # 🔹 Classification + Color
         if p < 0:
             status = "Inside"
+            color = 'green'
         elif p == 0:
             status = "On Circle"
+            color = 'blue'
         else:
             status = "Outside"
+            color = 'red'
 
         symmetric_points = [
             ( x + xc,  y + yc),
@@ -47,18 +45,17 @@ def midpoint_circle(radius, xc=0, yc=0):
             ( y + xc, -x + yc)
         ]
 
-        # 🔥 Terminal output
+        # 🔥 Terminal Output
         print(f"\nStep {step}: (x={x}, y={y}, p={p}) → {status}")
         print("8 Symmetric Points:")
 
         for i, pt in enumerate(symmetric_points):
             print(f"  P{i+1}: {pt}")
 
-            # plot (same logic, just cleaner)
             plt.scatter(pt[0], pt[1],
-                        color=colors[i],
-                        s=60,
-                        alpha=0.9)
+                        color=color,
+                        s=70,
+                        edgecolors='white')
 
         # 🔹 Update
         if p < 0:
@@ -70,21 +67,22 @@ def midpoint_circle(radius, xc=0, yc=0):
         x += 1
         step += 1
 
-    # Center
-    plt.scatter(xc, yc, color='yellow', s=100, label="Center")
+    # 🔹 Center
+    plt.scatter(xc, yc, color='yellow', s=120, label="Center")
 
-    # 🔹 Legend (classification meaning)
+    # 🔹 Legend
     plt.scatter([], [], color='green', label="Inside (p<0)")
     plt.scatter([], [], color='blue', label="On (p=0)")
     plt.scatter([], [], color='red', label="Outside (p>0)")
 
-    plt.title("Midpoint Circle (Beautiful + Classified)")
-    plt.xlabel("X")
-    plt.ylabel("Y")
+    plt.title("Midpoint Circle (Final Clean Version)", fontsize=14)
+    plt.xlabel("X-axis")
+    plt.ylabel("Y-axis")
+
     plt.axis("equal")
     plt.grid(True, linestyle='--', alpha=0.4)
-
     plt.legend()
+
     plt.show()
 
 
