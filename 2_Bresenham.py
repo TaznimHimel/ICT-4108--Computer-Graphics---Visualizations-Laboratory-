@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
 
+# 🔹 Bresenham Algorithm
 def bresenham_slope_based(x1, y1, x2, y2):
     points = []
 
@@ -42,108 +42,88 @@ def bresenham_slope_based(x1, y1, x2, y2):
     return points
 
 
-# 🔹 Function to calculate slope text
-def get_slope_info(x1, y1, x2, y2):
-    dx = x2 - x1
-    dy = y2 - y1
+# 🔹 Draw All Lines in One Plot
+def draw_all_lines(lines):
+    fig, ax = plt.subplots(figsize=(8, 8))
 
-    if dx == 0:
-        return "m = ∞ (vertical)"
-    
-    m = dy / dx
+    all_x, all_y = [], []
 
-    if m == 1:
-        return f"m = 1"
-    elif m > 1:
-        return f"m = {m:.2f} (>1)"
-    elif 0 < m < 1:
-        return f"m = {m:.2f} (<1)"
-    elif m < 0:
-        return f"m = {m:.2f} (negative)"
-    else:
-        return f"m = {m:.2f}"
+    for i, (x1, y1, x2, y2) in enumerate(lines):
+        points = bresenham_slope_based(x1, y1, x2, y2)
+        xs, ys = zip(*points)
+
+        color = plt.cm.tab10(i % 10)
+
+        # Plot line
+        ax.plot(xs, ys, marker='o', color=color, label=f"Line {i+1}")
+
+        # Mark start/end
+        ax.scatter(x1, y1, color='green', marker='s', s=80)
+        ax.scatter(x2, y2, color='red', marker='X', s=80)
+
+        # Collect bounds
+        all_x.extend(xs)
+        all_y.extend(ys)
+
+        # Label points (optional, can clutter)
+        for (x, y) in points:
+            ax.text(x, y, f"({x},{y})", fontsize=7)
+
+    # Grid setup (pixel style)
+    ax.set_xticks(range(min(all_x) - 1, max(all_x) + 2))
+    ax.set_yticks(range(min(all_y) - 1, max(all_y) + 2))
+    ax.grid(True)
+
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_title("Multiple Lines (Bresenham) - Single Figure")
+    ax.set_aspect('equal', adjustable='box')
+
+    ax.legend()
+    plt.tight_layout()
+    plt.show()
 
 
 # 🔹 MAIN
-n = int(input("How many lines do you want to draw? "))
+if __name__ == "__main__":
+    n = int(input("How many lines? "))
 
-lines = []
-for i in range(n):
-    print(f"\nLine {i+1}:")
-    x1 = int(input("Enter x1: "))
-    y1 = int(input("Enter y1: "))
-    x2 = int(input("Enter x2: "))
-    y2 = int(input("Enter y2: "))
-    lines.append((x1, y1, x2, y2))
+    lines = []
+    for i in range(n):
+        print(f"\nLine {i+1}:")
+        x1 = int(input("x1: "))
+        y1 = int(input("y1: "))
+        x2 = int(input("x2: "))
+        y2 = int(input("y2: "))
+        lines.append((x1, y1, x2, y2))
 
-
-# 🔹 Subplot setup
-cols = 2
-rows = (n + cols - 1) // cols
-
-fig, axes = plt.subplots(rows, cols, figsize=(10, 5 * rows))
-axes = np.array(axes).ravel()
-
-
-# 🔹 Plot
-for i, (x1, y1, x2, y2) in enumerate(lines):
-    ax = axes[i]
-
-    points = bresenham_slope_based(x1, y1, x2, y2)
-    xs, ys = zip(*points)
-
-    slope_text = get_slope_info(x1, y1, x2, y2)
-
-    ax.plot(xs, ys, marker='o')
-    ax.set_title(f"Line {i+1}\n{slope_text}")
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    ax.grid(True)
-    ax.axis("equal")
-
-    # Label points
-    for (x, y) in points:
-        ax.text(x, y, f"({x},{y})", fontsize=8)
-
-    # 🔹 Show slope inside graph (top-left corner)
-    ax.text(0.05, 0.9, slope_text, transform=ax.transAxes,
-            fontsize=10, verticalalignment='top')
-
-
-# 🔹 Remove unused plots
-for j in range(len(lines), len(axes)):
-    fig.delaxes(axes[j])
-
-
-plt.tight_layout()
-plt.show()
+    draw_all_lines(lines)
 
 
 
 
-
-# How many lines do you want to draw? 4
+#     How many lines? 4
 
 # Line 1:
-# Enter x1: 0
-# Enter y1: 0
-# Enter x2: 6
-# Enter y2: 6
+# x1: 0
+# y1: 0
+# x2: 6
+# y2: 6
 
 # Line 2:
-# Enter x1: 0
-# Enter y1: 6
-# Enter x2: 6
-# Enter y2: 0
+# x1: 0
+# y1: 6
+# x2: 6
+# y2: 0
 
 # Line 3:
-# Enter x1: 3
-# Enter y1: 0
-# Enter x2: 3
-# Enter y2: 6
+# x1: 3
+# y1: 0
+# x2: 3
+# y2: 6
 
 # Line 4:
-# Enter x1: 0
-# Enter y1: 3
-# Enter x2: 6
-# Enter y2: 3
+# x1: 0
+# y1: 3
+# x2: 6
+# y2: 3
