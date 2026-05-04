@@ -136,3 +136,31 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Enter window (xmin ymin xmax ymax): 2 2 10 10
+# Number of lines: 8
+
+# Line 1 (format: x0 y0 x1 y1)
+# 3 3 8 8
+
+# Line 2 (format: x0 y0 x1 y1)
+# 0 0 5 5
+
+# Line 3 (format: x0 y0 x1 y1)
+# 12 12 15 15
+
+# Line 4 (format: x0 y0 x1 y1)
+# 0 5 15 5
+
+# Line 5 (format: x0 y0 x1 y1)
+# 5 0 5 15
+
+# Line 6 (format: x0 y0 x1 y1)
+# 2 2 10 10
+
+# Line 7 (format: x0 y0 x1 y1)
+# 2 8 10 8
+
+# Line 8 (format: x0 y0 x1 y1)
+# -5 6 15 6
