@@ -117,3 +117,33 @@ for j in range(len(lines), len(axes)):
 
 plt.tight_layout()
 plt.show()
+
+
+
+
+
+# How many lines do you want to draw? 4
+
+# Line 1:
+# Enter x1: 0
+# Enter y1: 0
+# Enter x2: 6
+# Enter y2: 6
+
+# Line 2:
+# Enter x1: 0
+# Enter y1: 6
+# Enter x2: 6
+# Enter y2: 0
+
+# Line 3:
+# Enter x1: 3
+# Enter y1: 0
+# Enter x2: 3
+# Enter y2: 6
+
+# Line 4:
+# Enter x1: 0
+# Enter y1: 3
+# Enter x2: 6
+# Enter y2: 3
